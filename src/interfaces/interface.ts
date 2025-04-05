@@ -8,9 +8,4 @@ export interface PaymentResponse {
   state: "SUCCESS" | "FAILED" | "PENDING"; // ajusta según los posibles estados
 }
 
-export interface ReciboEstilo {
-  icono: string;
-  titulo: string;
-  imagen: string;
-  border:string
-}
+
