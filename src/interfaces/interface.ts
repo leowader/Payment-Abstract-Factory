@@ -1,7 +1,4 @@
-export type PaymentMethod = "creditcard" | "debitcard" | "paypal" | "";
-export type PaymentType = "creditcard" | "debitcard" | "paypal" | null;
-
-
+export type PaymentType = "creditcard" | "debitcard" | "paypal" |  "";
   export interface PaymentResponse {
     finalAmount: number;
     initialAmount: number;

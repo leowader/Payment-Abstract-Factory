@@ -1,30 +1,26 @@
 import { useEffect, useState } from "react";
 import { api } from "../axios/axios";
-import {
-  PaymentMethod,
-  PaymentResponse,
-  PaymentType,
-} from "../interfaces/interface";
+import { PaymentResponse, PaymentType } from "../interfaces/interface";
 import { configureFactoryProvider } from "../provider/config/configureFactoryProvider";
 
 export default function Home() {
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentType>("");
   const [amount, setAmount] = useState<string>("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [message, setMessage] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
   const [state, setState] = useState("");
-  const [paymentType, setPaymentType] = useState<PaymentType>(null);
+  const [paymentType, setPaymentType] = useState<PaymentType>("");
   const [bg, setBg] = useState<String>("");
-  const handlePaymentMethodChange = (method: PaymentMethod) => {
+  const handlePaymentMethodChange = (method: PaymentType) => {
     setPaymentMethod(method);
     setAmount("");
     setShowReceipt(false);
   };
   useEffect(() => {
-    const res = configureFactoryProvider(paymentMethod);//SE CONFIGURA EL PROVIDER
+    const res = configureFactoryProvider(paymentMethod); //SE CONFIGURA EL PROVIDER
     console.log("CONFIGURACION PROVIDER: ");
-    setBg(res.getProvider().crearFondo().renderFondo());//SE CAMBIA EL FONDO 
+    setBg(res.getProvider().crearFondo().renderFondo()); //SE CAMBIA EL FONDO
 
     return () => {};
   }, [paymentMethod]);
@@ -55,12 +51,13 @@ export default function Home() {
   };
 
   return (
-    <div className={`flex flex-col items-center p-6 ${bg} min-h-screen`}>//ACTUALIZA EL COLOR DE FONDO
+    // //ACTUALIZA EL COLOR DE FONDO
+    <div className={`flex flex-col items-center p-6 ${bg} min-h-screen`}>
       <h1 className="text-3xl font-bold mb-2"> 💲Sistema de Pago💲 </h1>
       <br />
       <h2 className="text-xl mb-4">Selecciona un método de pago</h2>
       <div className="flex gap-4 mb-6">
-        {(["creditcard", "debitcard", "paypal"] as PaymentMethod[]).map(
+        {(["creditcard", "debitcard", "paypal"] as PaymentType[]).map(
           (method) => (
             <button
               key={method}
