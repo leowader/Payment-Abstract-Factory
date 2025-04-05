@@ -1,35 +1,48 @@
 import { useEffect, useState } from "react";
 import { api } from "../axios/axios";
-import { PaymentResponse, PaymentType } from "../interfaces/interface";
+import {
+  PaymentResponse,
+  PaymentType,
+  ReciboEstilo,
+} from "../interfaces/interface";
 import { configureFactoryProvider } from "../provider/config/configureFactoryProvider";
 
 export default function Home() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentType>("");
+  const [paymentMethodForStyle, setPaymentMethodForStyle] =
+    useState<PaymentType>("");
+
   const [amount, setAmount] = useState<string>("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [message, setMessage] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
   const [state, setState] = useState("");
   const [paymentType, setPaymentType] = useState<PaymentType>("");
+
+  //VARIABLES DE ESTILOS
   const [bg, setBg] = useState<String>("");
+  const [estiloRecibo, setEstiloRecibo] = useState<ReciboEstilo | null>(null);
+
   const handlePaymentMethodChange = (method: PaymentType) => {
     setPaymentMethod(method);
+    setPaymentMethodForStyle(method);
+    console.log("Método de pago seleccionado:", method);
     setAmount("");
     setShowReceipt(false);
   };
+
   useEffect(() => {
     const res = configureFactoryProvider(paymentMethod); //SE CONFIGURA EL PROVIDER
-    console.log("CONFIGURACION PROVIDER: ");
     setBg(res.getProvider().crearFondo().renderFondo()); //SE CAMBIA EL FONDO
-
+    setEstiloRecibo(res.getProvider().crearRecibo().renderRecibo()); //SE CAMBIA LOS ESTILOS DEL RECIBO
     return () => {};
-  }, [paymentMethod]);
+  }, [paymentMethodForStyle]);
+
   const handlePayment = async () => {
     if (!amount || Number(amount) <= 0) {
       alert("Por favor, ingrese un monto válido.");
       return;
     }
-
     try {
       const res = await api.post(`${paymentMethod}`, {
         amount: Number(amount),
@@ -40,18 +53,16 @@ export default function Home() {
       setMessage(response.message);
       setFinalAmount(response.finalAmount);
       setState(response.state);
-      setPaymentMethod("");
       setShowReceipt(true);
+      setPaymentMethod("");
 
       setTimeout(() => setShowReceipt(false), 4000);
     } catch (error) {
       alert("Error al procesar el pago. Intente nuevamente.");
-      console.error(error);
     }
   };
 
   return (
-    // //ACTUALIZA EL COLOR DE FONDO
     <div className={`flex flex-col items-center p-6 ${bg} min-h-screen`}>
       <h1 className="text-3xl font-bold mb-2"> 💲Sistema de Pago💲 </h1>
       <br />
@@ -96,13 +107,24 @@ export default function Home() {
       )}
 
       {showReceipt && (
-        <div className="relative flex flex-col items-center bg-white p-6 w-80 shadow-lg rounded-lg border border-gray-300 font-mono mt-6">
+        <div
+          className={`relative flex flex-col items-center bg-white p-6 w-80 shadow-lg rounded-lg font-mono mt-6 ${estiloRecibo?.border}`}
+        >
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-gray-300 rounded-b-full"></div>
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 h-4 bg-gray-300 rounded-t-full"></div>
 
           <h2 className="text-xl font-bold border-b w-full text-center pb-2 mb-4">
-            🧾 Recibo de Pago
+            {estiloRecibo?.icono} {estiloRecibo?.titulo}
           </h2>
+
+          {/* Imagen dinámica desde estiloRecibo */}
+          {estiloRecibo?.imagen && (
+            <img
+              src={estiloRecibo.imagen}
+              alt="Método de pago"
+              className=" object-contain mb-4"
+            />
+          )}
 
           <div className="text-sm w-full">
             <p className="flex justify-between border-b py-1">
