@@ -1,27 +1,69 @@
 import { useEffect, useState } from "react";
 import { api } from "../axios/axios";
-import { PaymentResponse, PaymentType } from "../interfaces/interface";
+import {
+  NotificationType,
+  PaymentResponse,
+  PaymentType,
+} from "../interfaces/interface";
 
 import { configureFactoryProvider } from "../provider/config/configureFactoryProvider";
 import { IRecibo } from "../abstractFactory/IRecibo";
 
 export default function Home() {
-  const [paymentMethod, setPaymentMethod] = useState<PaymentType>("");
-  const [paymentMethodForStyle, setPaymentMethodForStyle] =
-    useState<PaymentType>("");
-
   const [amount, setAmount] = useState<string>("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [responseApi, setResponseApi] = useState<PaymentResponse | null>(null);
 
-  const [bg, setBg] = useState<String>("");
-  const [reciboComponent, setReciboComponent] = useState<IRecibo | null>(null);
+  // PAGO
+  const [paymentMethod, setPaymentMethod] = useState<PaymentType>("");
+  const [paymentMethodForStyle, setPaymentMethodForStyle] =
+    useState<PaymentType>("");
 
   const handlePaymentMethodChange = (method: PaymentType) => {
     setPaymentMethod(method);
     setPaymentMethodForStyle(method);
     setAmount("");
     setShowReceipt(false);
+  };
+
+  // REDISEÑOS
+  const [bg, setBg] = useState<String>("");
+  const [reciboComponent, setReciboComponent] = useState<IRecibo | null>(null);
+
+  // NOTIFICACION DE PAGO
+  const handleNotificationMethodChange = async (method: NotificationType) => {
+    
+    try {
+      const respuestaNotificacion = await api.post(
+        `notification/${method}`,
+        responseApi
+      );
+      alert(respuestaNotificacion.data);
+    } catch (error) {
+      alert("Error al procesar la notificación. Intente nuevamente.");
+    }
+  };
+
+  //POST DE PAGO
+  const handlePayment = async () => {
+    if (!amount || Number(amount) <= 0) {
+      alert("Por favor, ingrese un monto válido.");
+      return;
+    }
+    try {
+      const res = await api.post(`payment/${paymentMethod}`, {
+        amount: Number(amount),
+      });
+
+      const resApi: PaymentResponse = res.data;
+      setResponseApi(resApi);
+      setShowReceipt(true);
+      setPaymentMethod("");
+
+      //setTimeout(() => setShowReceipt(false), 4000);
+    } catch (error) {
+      alert("Error al procesar el pago. Intente nuevamente.");
+    }
   };
 
   useEffect(() => {
@@ -31,28 +73,6 @@ export default function Home() {
     setReciboComponent(recibo);
     return () => {};
   }, [paymentMethodForStyle]);
-
-  const handlePayment = async () => {
-    if (!amount || Number(amount) <= 0) {
-      alert("Por favor, ingrese un monto válido.");
-      return;
-    }
-    try {
-      const res = await api.post(`${paymentMethod}`, {
-        amount: Number(amount),
-      });
-
-      const resApi: PaymentResponse = res.data;
-      setResponseApi(resApi);
-
-      setShowReceipt(true);
-      setPaymentMethod("");
-
-      setTimeout(() => setShowReceipt(false), 4000);
-    } catch (error) {
-      alert("Error al procesar el pago. Intente nuevamente.");
-    }
-  };
 
   return (
     <div className={`flex flex-col items-center p-6 ${bg} min-h-screen`}>
@@ -98,7 +118,35 @@ export default function Home() {
         </div>
       )}
 
-      {showReceipt && responseApi && reciboComponent?.renderRecibo(responseApi)}
+      {showReceipt && responseApi && (
+        <>
+          {reciboComponent?.renderRecibo(responseApi)}
+          <div>
+            <h2 className="text-xl mb-4 mt-4">
+              ¿A dónde desea que le envíe la confirmación de pago?{" "}
+            </h2>
+            <div className="flex gap-4 mb-6">
+              {(["sms", "whatsapp", "email"] as NotificationType[]).map(
+                (method) => (
+                  <button
+                    key={method}
+                    className={`px-4 py-2 rounded ${
+                      paymentMethod === method
+                        ? "bg-blue-500 text-white"
+                        : "bg-white"
+                    }`}
+                    onClick={() => handleNotificationMethodChange(method)}
+                  >
+                    {method === "sms" && "💳 Mensaje de texto"}
+                    {method === "whatsapp" && "💵 Whatsapp"}
+                    {method === "email" && "🅿️ Email"}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

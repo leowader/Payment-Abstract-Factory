@@ -1,4 +1,5 @@
 export type PaymentType = "creditcard" | "debitcard" | "paypal" | "";
+export type NotificationType = "sms" | "whatsapp" | "email" | "";
 
 export interface PaymentResponse {
   finalAmount: number;
