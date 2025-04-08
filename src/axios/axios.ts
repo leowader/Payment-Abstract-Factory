@@ -1,10 +1,13 @@
 import axios from "axios";
 
-export const api = axios.create({
-  baseURL: "http://localhost:8080/",
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
+const getBaseURL = (port: 8080 | 8081) => `http://localhost:${port}/`;
 
+export const createApiInstance = (port: 8080 | 8081) => {
+  return axios.create({
+    baseURL: getBaseURL(port),
+    withCredentials: true,
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};

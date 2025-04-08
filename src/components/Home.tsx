@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { api } from "../axios/axios";
+import { createApiInstance } from "../axios/axios";
+
 import {
   NotificationType,
   PaymentResponse,
@@ -10,6 +11,11 @@ import { configureFactoryProvider } from "../provider/config/configureFactoryPro
 import { IRecibo } from "../abstractFactory/IRecibo";
 
 export default function Home() {
+
+  const apiPayment = createApiInstance(8080);
+  const apiNotification = createApiInstance(8081);
+
+
   const [amount, setAmount] = useState<string>("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [responseApi, setResponseApi] = useState<PaymentResponse | null>(null);
@@ -34,7 +40,7 @@ export default function Home() {
   const handleNotificationMethodChange = async (method: NotificationType) => {
     
     try {
-      const respuestaNotificacion = await api.post(
+      const respuestaNotificacion = await apiNotification.post(
         `notification/${method}`,
         responseApi
       );
@@ -51,7 +57,7 @@ export default function Home() {
       return;
     }
     try {
-      const res = await api.post(`payment/${paymentMethod}`, {
+      const res = await apiPayment.post(`payment/${paymentMethod}`, {
         amount: Number(amount),
       });
 
