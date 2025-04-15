@@ -9,6 +9,7 @@ import {
 
 import { configureFactoryProvider } from "../provider/config/configureFactoryProvider";
 import { IRecibo } from "../abstractFactory/IRecibo";
+import ReportForm from "./FormPDF";
 
 export default function Home() {
 
@@ -104,23 +105,26 @@ export default function Home() {
       </div>
 
       {paymentMethod && (
-        <div className="w-64 p-4 bg-white shadow-lg rounded-lg text-center">
-          <label className="block text-gray-700 text-lg font-semibold mb-2">
-            Monto
-          </label>
-          <input
-            type="number"
-            className="w-full p-2 border border-gray-300 rounded mb-4 text-center"
-            placeholder="Ingrese el monto"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <button
-            className="w-full bg-green-500 text-white py-2 rounded"
-            onClick={handlePayment}
-          >
-            Pagar
-          </button>
+        <div>
+         <div className="w-64 p-4 bg-white shadow-lg rounded-lg text-center">
+            <label className="block text-gray-700 text-lg font-semibold mb-2">
+              Monto
+            </label>
+            <input
+              type="number"
+              className="w-full p-2 border border-gray-300 rounded mb-4 text-center"
+              placeholder="Ingrese el monto"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+            />
+            <button
+              className="w-full bg-green-500 text-white py-2 rounded"
+              onClick={handlePayment}
+            >
+              Pagar
+            </button>
+          </div>
+            {<ReportForm></ReportForm>}
         </div>
       )}
 
