@@ -2,9 +2,10 @@
 "use client";
 
 import { useState } from "react";
-import { Tema, Formato, PDFOptions } from "../interfaces/interface";
+import { Tema, Formato, PDFOptions , PaymentResponse} from "../interfaces/interface";
 
-export default function ReportForm() {
+
+export default function ReportForm({ responseApi }: { responseApi: PaymentResponse | null }) {
   const [form, setForm] = useState<PDFOptions>({
     includeLogo: true,
     title: "",
@@ -29,6 +30,7 @@ export default function ReportForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Formulario enviado:", form);
+    console.log("Respuesta de la API:", responseApi);
   };
 
   return (

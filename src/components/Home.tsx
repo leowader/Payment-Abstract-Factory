@@ -12,14 +12,12 @@ import { IRecibo } from "../abstractFactory/IRecibo";
 import ReportForm from "./FormPDF";
 
 export default function Home() {
-
   const apiPayment = createApiInstance(8080);
   const apiNotification = createApiInstance(8081);
-
-
   const [amount, setAmount] = useState<string>("");
   const [showReceipt, setShowReceipt] = useState(false);
   const [responseApi, setResponseApi] = useState<PaymentResponse | null>(null);
+  const [notificationSent, setNotificationSent] = useState(false);
 
   // PAGO
   const [paymentMethod, setPaymentMethod] = useState<PaymentType>("");
@@ -39,14 +37,15 @@ export default function Home() {
 
   // NOTIFICACION DE PAGO
   const handleNotificationMethodChange = async (method: NotificationType) => {
-    
     try {
       const respuestaNotificacion = await apiNotification.post(
         `notification/${method}`,
         responseApi
       );
       alert(respuestaNotificacion.data);
+      setNotificationSent(true);
     } catch (error) {
+      setNotificationSent(true);
       alert("Error al procesar la notificación. Intente nuevamente.");
     }
   };
@@ -66,8 +65,6 @@ export default function Home() {
       setResponseApi(resApi);
       setShowReceipt(true);
       setPaymentMethod("");
-
-      //setTimeout(() => setShowReceipt(false), 4000);
     } catch (error) {
       alert("Error al procesar el pago. Intente nuevamente.");
     }
@@ -106,7 +103,7 @@ export default function Home() {
 
       {paymentMethod && (
         <div>
-         <div className="w-64 p-4 bg-white shadow-lg rounded-lg text-center">
+          <div className="w-64 p-4 bg-white shadow-lg rounded-lg text-center">
             <label className="block text-gray-700 text-lg font-semibold mb-2">
               Monto
             </label>
@@ -124,13 +121,13 @@ export default function Home() {
               Pagar
             </button>
           </div>
-            {<ReportForm></ReportForm>}
         </div>
       )}
 
-      {showReceipt && responseApi && (
+      {showReceipt && responseApi && !notificationSent && (
         <>
           {reciboComponent?.renderRecibo(responseApi)}
+
           <div>
             <h2 className="text-xl mb-4 mt-4">
               ¿A dónde desea que le envíe la confirmación de pago?{" "}
@@ -157,6 +154,8 @@ export default function Home() {
           </div>
         </>
       )}
+
+      {notificationSent && <ReportForm responseApi={responseApi} />}
     </div>
   );
 }
