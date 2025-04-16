@@ -1,21 +1,40 @@
-// components/ReportForm.tsx
 "use client";
 
 import { useState } from "react";
-import { Tema, Formato, PDFOptions , PaymentResponse} from "../interfaces/interface";
+import {
+  Tema,
+  Formato,
+  PDFOptions,
+  PaymentResponse,
+  DTOUserInfo,
+} from "../interfaces/interface";
+import { createApiInstance } from "../axios/axios";
 
+export default function ReportForm({
+  responseApi,
+  
+}: {
+  responseApi: PaymentResponse | null;
+ 
+ 
+}) {
+  const apiPDF = createApiInstance(8082);
 
-export default function ReportForm({ responseApi }: { responseApi: PaymentResponse | null }) {
   const [form, setForm] = useState<PDFOptions>({
     includeLogo: true,
     title: "",
     includePaymentDetails: true,
     includeUserInfo: true,
     theme: Tema.LIGHT,
-    includeTimestamp: true,
+    includeTimeStamp: true,
     footerMessage: "",
     format: Formato.A4,
   });
+
+  const userInfo: DTOUserInfo = {
+    nombre: "Carlos Pérez",
+    identificacion: "123456789",
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -27,15 +46,38 @@ export default function ReportForm({ responseApi }: { responseApi: PaymentRespon
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Formulario enviado:", form);
-    console.log("Respuesta de la API:", responseApi);
+
+    const requestData = {
+      ...form,
+      userInfo: userInfo,
+      paymentDetails: {
+        ...responseApi,
+        date: new Date(),
+      },
+    };
+
+    try {
+      const resposePDF = await apiPDF.post(`pdf`, requestData);
+      if (resposePDF.data.pdfPath) {
+        window.open(resposePDF.data.pdfPath, "_blank");
+        window.location.reload();
+        setTimeout(() => {}, 3000);
+      }
+    } catch (error) {
+      alert("Error al generar el PDF.");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto p-6 bg-white shadow rounded-2xl space-y-6">
-      <h2 className="text-2xl font-bold text-center text-gray-700">Configuración del Reporte</h2>
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-xl mx-auto p-6 bg-white shadow rounded-2xl space-y-6"
+    >
+      <h2 className="text-2xl font-bold text-center text-gray-700">
+        Configuración del Reporte
+      </h2>
       {[
         { label: "Incluir logo", name: "includeLogo" },
         { label: "Incluir detalles de pago", name: "includePaymentDetails" },
@@ -80,7 +122,7 @@ export default function ReportForm({ responseApi }: { responseApi: PaymentRespon
       <div>
         <label className="block text-gray-600">Tema</label>
         <select
-          name="Tema"
+          name="theme"
           value={form.theme}
           onChange={handleChange}
           className="w-full mt-1 p-2 border rounded-lg"

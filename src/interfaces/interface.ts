@@ -1,12 +1,12 @@
 export type PaymentType = "creditcard" | "debitcard" | "paypal" | "";
 export type NotificationType = "sms" | "whatsapp" | "email" | "";
 export enum Tema {
-  LIGHT = "light",
-  DARK = "dark"
+  LIGHT = "LIGHT",
+  DARK = "DARK",
 }
 export enum Formato {
-  A4 = "a4",
-  Letter = "letter"
+  A4 = "A4",
+  Letter = "LETTER",
 }
 
 export interface PaymentResponse {
@@ -23,9 +23,12 @@ export interface PDFOptions {
   includePaymentDetails: boolean;
   includeUserInfo: boolean;
   theme: Tema;
-  includeTimestamp: boolean;
+  includeTimeStamp: boolean;
   footerMessage: string;
   format: Formato;
 }
 
-
+export interface DTOUserInfo {
+  identificacion: string;
+  nombre: string;
+}
