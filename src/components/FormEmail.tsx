@@ -5,8 +5,8 @@ type EmailFormProps = {
 };
 
 export default function EmailForm({ onSubmit }: EmailFormProps) {
-  const [ccList, setCcList] = useState([""]);
-  const [bccList, setBccList] = useState([""]);
+  const [cc, setCcList] = useState([""]);
+  const [bcc, setBccList] = useState([""]);
   const [to, setTo] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
@@ -17,8 +17,8 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
       to,
       subject,
       body,
-      ccList,
-      bccList,
+      cc,
+      bcc,
       priority,
     }};
     onSubmit(emailData);
@@ -49,17 +49,17 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
 
       <div>
         <label className="font-semibold">Destinatarios con copia - CC:</label>
-        {ccList.map((item, index) => (
+        {cc.map((item, index) => (
           <div key={index} className="flex gap-2 mt-1">
             <input
               type="text"
               value={item}
-              onChange={(e) => handleChange(setCcList, ccList, index, e.target.value)}
+              onChange={(e) => handleChange(setCcList, cc, index, e.target.value)}
               className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring flex-1"
             />
-            <button onClick={() => handleAddField(setCcList, ccList)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">+</button>
-            {ccList.length > 1 && (
-              <button onClick={() => handleRemoveField(setCcList, ccList, index)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition bg-red-500">−</button>
+            <button onClick={() => handleAddField(setCcList, cc)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">+</button>
+            {cc.length > 1 && (
+              <button onClick={() => handleRemoveField(setCcList, cc, index)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition bg-red-500">−</button>
             )}
           </div>
         ))}
@@ -67,17 +67,17 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
 
       <div>
         <label className="font-semibold">Destinatarios con copia oculta - BCC:</label>
-        {bccList.map((item, index) => (
+        {bcc.map((item, index) => (
           <div key={index} className="flex gap-2 mt-1">
             <input
               type="text"
               value={item}
-              onChange={(e) => handleChange(setBccList, bccList, index, e.target.value)}
+              onChange={(e) => handleChange(setBccList, bcc, index, e.target.value)}
               className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring flex-1"
             />
-            <button onClick={() => handleAddField(setBccList, bccList)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">+</button>
-            {bccList.length > 1 && (
-              <button onClick={() => handleRemoveField(setBccList, bccList, index)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition bg-red-500">−</button>
+            <button onClick={() => handleAddField(setBccList, bcc)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition">+</button>
+            {bcc.length > 1 && (
+              <button onClick={() => handleRemoveField(setBccList, bcc, index)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition bg-red-500">−</button>
             )}
           </div>
         ))}
@@ -86,9 +86,9 @@ export default function EmailForm({ onSubmit }: EmailFormProps) {
       <div>
         <label className="font-semibold">Prioridad:</label>
         <select className="w-full px-3 py-2 border rounded-xl focus:outline-none focus:ring" onChange={(e) => setPriority(e.target.value)}>
-          <option>Alta</option>
-          <option>Media</option>
-          <option>Baja</option>
+          <option>ALTA</option>
+          <option>MEDIA</option>
+          <option>BAJA</option>
         </select>
       </div>
       <button

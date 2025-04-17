@@ -23,7 +23,7 @@ export default function SMSForm({ onSubmit }: SMSFormProps) {
   };
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-2xl space-y-4 mt-6">
-      <h2 className="text-xl font-bold text-gray-700">SMS Form</h2>
+      <h2 className="text-xl font-bold text-gray-700">Formulario SMS</h2>
 
       <input
         type="text"

@@ -13,6 +13,7 @@ import ReportForm from "./FormPDF";
 import EmailForm from "./FormEmail";
 import SMSForm from "./FormSms";
 import WhatsAppForm from "./FormWpp";
+import axios from "axios";
 
 export default function Home() {
   const apiPayment = createApiInstance(8080);
@@ -52,15 +53,14 @@ export default function Home() {
   const handleNotificationSent = async (data: any) => {
     try {
       const respuestaNotificacion = await apiNotification.post(
-        `notification/${notificationType}`,
-        data
-      );
+         `notification/${notificationType}`,
+         data
+       );
+      
       setNotificationType("");
       setNotificationSent(true);
       alert(respuestaNotificacion.data);
     } catch (error) {
-      setNotificationSent(true);
-      setNotificationType("");
       alert("Error al procesar la notificación. Intente nuevamente.");
     }
   };
