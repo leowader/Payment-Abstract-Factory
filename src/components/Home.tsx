@@ -10,6 +10,9 @@ import {
 import { configureFactoryProvider } from "../provider/config/configureFactoryProvider";
 import { IRecibo } from "../abstractFactory/IRecibo";
 import ReportForm from "./FormPDF";
+import EmailForm from "./FormEmail";
+import SMSForm from "./FormSms";
+import WhatsAppForm from "./FormWpp";
 
 export default function Home() {
   const apiPayment = createApiInstance(8080);
@@ -18,6 +21,7 @@ export default function Home() {
   const [showReceipt, setShowReceipt] = useState(false);
   const [responseApi, setResponseApi] = useState<PaymentResponse | null>(null);
   const [notificationSent, setNotificationSent] = useState(false);
+  const [notificationType, setNotificationType] = useState("");
 
   // PAGO
   const [paymentMethod, setPaymentMethod] = useState<PaymentType>("");
@@ -35,21 +39,32 @@ export default function Home() {
   const [bg, setBg] = useState<String>("");
   const [reciboComponent, setReciboComponent] = useState<IRecibo | null>(null);
 
-  // NOTIFICACION DE PAGO
+  // CAMBIO DE TIPO DE NOTIFICACION PARA EL FORM
   const handleNotificationMethodChange = async (method: NotificationType) => {
     try {
-      const respuestaNotificacion = await apiNotification.post(
-        `notification/${method}`,
-        responseApi
-      );
-      alert(respuestaNotificacion.data);
-      setNotificationSent(true);
+      setNotificationType(method);
     } catch (error) {
-      setNotificationSent(true);
       alert("Error al procesar la notificación. Intente nuevamente.");
     }
   };
 
+  //ENVIO DE NOTIFICACION
+  const handleNotificationSent = async (data: any) => {
+    try {
+      const respuestaNotificacion = await apiNotification.post(
+        `notification/${notificationType}`,
+        data
+      );
+      setNotificationType("");
+      setNotificationSent(true);
+      alert(respuestaNotificacion.data);
+    } catch (error) {
+      setNotificationSent(true);
+      setNotificationType("");
+      alert("Error al procesar la notificación. Intente nuevamente.");
+    }
+  };
+  
   //POST DE PAGO
   const handlePayment = async () => {
     if (!amount || Number(amount) <= 0) {
@@ -124,7 +139,7 @@ export default function Home() {
         </div>
       )}
 
-      {showReceipt && responseApi && !notificationSent && (
+      {showReceipt && responseApi && !notificationSent && notificationType === "" && (
         <>
           {reciboComponent?.renderRecibo(responseApi)}
 
@@ -154,7 +169,8 @@ export default function Home() {
           </div>
         </>
       )}
-      {notificationSent && <ReportForm responseApi={responseApi} />}
+      {notificationType === "email" ? <EmailForm onSubmit={handleNotificationSent}/> : notificationType === "sms" ? <SMSForm onSubmit={handleNotificationSent}/> : notificationType === "whatsapp" ? <WhatsAppForm onSubmit={handleNotificationSent}/> : ""}
+      {notificationSent && notificationType === "" && <ReportForm responseApi={responseApi} />}
     </div>
   );
 }
